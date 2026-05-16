@@ -6,7 +6,19 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { OrderDialog } from "@/components/OrderDialog";
 import { type Product } from "@/lib/store-config";
 import { supabase, supabaseEnabled, type ProductRow } from "@/lib/supabase";
-import { Minus, Plus, Trash2, Loader2, Heart, HandMetal, Clock, ShieldCheck, MessageCircle, Instagram } from "lucide-react";
+import {
+  Minus,
+  Plus,
+  Trash2,
+  Loader2,
+  Heart,
+  HandMetal,
+  Clock,
+  ShieldCheck,
+  MessageCircle,
+  Instagram,
+} from "lucide-react";
+import { CustomisationDialog, type Customisation } from "@/components/CustomisationDialog";
 
 export const Route = createFileRoute("/shop")({
   head: () => ({
@@ -26,7 +38,7 @@ export const Route = createFileRoute("/shop")({
   component: ShopPage,
 });
 
-type CartItem = { product: Product; qty: number };
+type CartItem = { product: Product; qty: number; customisation?: Customisation };
 type FilterType = "all" | "personalisable" | "signature";
 
 function SectionLabel({ n, children }: { n: string; children: React.ReactNode }) {
@@ -47,7 +59,15 @@ async function withTimeout<T>(promise: PromiseLike<T>, ms = 8000): Promise<T> {
   return Promise.race([Promise.resolve(promise), timeout]).finally(() => clearTimeout(timeoutId));
 }
 
-const PASTEL_SWATCHES = ["#f9c5c5","#f7d9b5","#f9f0a4","#b9eabd","#b5d9f7","#d9b5f7","#f7b5d9"];
+const PASTEL_SWATCHES = [
+  "#f9c5c5",
+  "#f7d9b5",
+  "#f9f0a4",
+  "#b9eabd",
+  "#b5d9f7",
+  "#d9b5f7",
+  "#f7b5d9",
+];
 
 function PersonalisationRow({ customizable }: { customizable?: boolean }) {
   if (!customizable) {
@@ -66,20 +86,29 @@ function PersonalisationRow({ customizable }: { customizable?: boolean }) {
           style={{ backgroundColor: c }}
         />
       ))}
-      <span className="ml-1 text-[9px] uppercase tracking-[0.2em] text-muted-foreground">+more</span>
+      <span className="ml-1 text-[9px] uppercase tracking-[0.2em] text-muted-foreground">
+        +more
+      </span>
     </div>
   );
 }
 
 const TESTIMONIALS = [
   { quote: "The name charm arrived beautifully — exactly what I wanted.", name: "Aisha R." },
-  { quote: "Ordered a custom candy band for my friend's birthday. She loved it!", name: "Mehak S." },
+  {
+    quote: "Ordered a custom candy band for my friend's birthday. She loved it!",
+    name: "Mehak S.",
+  },
   { quote: "So delicate and pretty. Will definitely be ordering again.", name: "Zara T." },
 ];
 
 const IG_TILES = [
-  { bg: "#f9e4e4" }, { bg: "#f0e6d3" }, { bg: "#d9eaf5" },
-  { bg: "#e8f5e2" }, { bg: "#f7e8f5" }, { bg: "#fdf5e0" },
+  { bg: "#f9e4e4" },
+  { bg: "#f0e6d3" },
+  { bg: "#d9eaf5" },
+  { bg: "#e8f5e2" },
+  { bg: "#f7e8f5" },
+  { bg: "#fdf5e0" },
 ];
 
 function ShopPage() {
@@ -89,12 +118,17 @@ function ShopPage() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<FilterType>("all");
   const [wishlist, setWishlist] = useState<Set<string>>(new Set());
+  const [customiseTarget, setCustomiseTarget] = useState<Product | null>(null);
+  const [customiseOpen, setCustomiseOpen] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
     async function load() {
       if (!supabaseEnabled) {
-        if (!cancelled) { setProducts([]); setLoading(false); }
+        if (!cancelled) {
+          setProducts([]);
+          setLoading(false);
+        }
         return;
       }
       try {
@@ -110,8 +144,12 @@ function ShopPage() {
         if (!error && data) {
           setProducts(
             (data as ProductRow[]).map((r) => ({
-              id: r.id, name: r.name, price: r.price,
-              description: r.description, image: r.image_url, customizable: r.customizable,
+              id: r.id,
+              name: r.name,
+              price: r.price,
+              description: r.description,
+              image: r.image_url,
+              customizable: r.customizable,
             })),
           );
         }
@@ -122,7 +160,9 @@ function ShopPage() {
       }
     }
     load();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const filteredProducts = useMemo(() => {
@@ -134,23 +174,41 @@ function ShopPage() {
   const totalQty = useMemo(() => cart.reduce((s, i) => s + i.qty, 0), [cart]);
   const total = useMemo(() => cart.reduce((s, i) => s + i.product.price * i.qty, 0), [cart]);
 
-  const add = (p: Product) =>
+  const handleAddToCart = (p: Product) => {
+    if (p.customizable) {
+      setCustomiseTarget(p);
+      setCustomiseOpen(true);
+    } else {
+      addToCart(p, undefined);
+    }
+  };
+
+  const addToCart = (p: Product, customisation?: Customisation) => {
     setCart((c) => {
       const ex = c.find((i) => i.product.id === p.id);
-      if (ex) return c.map((i) => (i.product.id === p.id ? { ...i, qty: i.qty + 1 } : i));
-      return [...c, { product: p, qty: 1 }];
+      if (ex && !customisation)
+        return c.map((i) => (i.product.id === p.id ? { ...i, qty: i.qty + 1 } : i));
+      return [...c, { product: p, qty: 1, customisation }];
     });
+  };
 
   const setQty = (id: string, qty: number) =>
     setCart((c) =>
-      qty <= 0 ? c.filter((i) => i.product.id !== id)
-               : c.map((i) => (i.product.id === id ? { ...i, qty } : i)),
+      qty <= 0
+        ? c.filter((i) => i.product.id !== id)
+        : c.map((i) => (i.product.id === id ? { ...i, qty } : i)),
     );
 
   const toggleWishlist = (id: string) =>
     setWishlist((w) => {
       const next = new Set(w);
-      next.has(id) ? next.delete(id) : next.add(id);
+
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+
       return next;
     });
 
@@ -174,8 +232,8 @@ function ShopPage() {
             </h1>
           </div>
           <p className="text-[15px] leading-relaxed text-muted-foreground md:col-span-5 md:col-start-8 md:pt-2">
-            Each piece is made to order in our atelier. Customisations — names, colours,
-            sizing — are welcomed at checkout.
+            Each piece is made to order in our atelier. Customisations — names, colours, sizing —
+            are welcomed at checkout.
           </p>
         </div>
 
@@ -228,7 +286,9 @@ function ShopPage() {
                   >
                     <Heart
                       className={`h-4 w-4 transition-colors ${
-                        wishlist.has(p.id) ? "fill-foreground text-foreground" : "text-muted-foreground"
+                        wishlist.has(p.id)
+                          ? "fill-foreground text-foreground"
+                          : "text-muted-foreground"
                       }`}
                     />
                   </button>
@@ -253,7 +313,7 @@ function ShopPage() {
                 </Link>
 
                 <button
-                  onClick={() => add(p)}
+                  onClick={() => handleAddToCart(p)}
                   className="mt-4 text-[11px] uppercase tracking-[0.3em] text-foreground underline-offset-[6px] transition hover:underline"
                 >
                   Add to cart +
@@ -275,7 +335,7 @@ function ShopPage() {
             {TESTIMONIALS.map((t) => (
               <div key={t.name} className="border border-border/60 bg-background p-7">
                 <div className="flex gap-0.5">
-                  {[1,2,3,4,5].map((n) => (
+                  {[1, 2, 3, 4, 5].map((n) => (
                     <svg key={n} className="h-3.5 w-3.5 fill-foreground" viewBox="0 0 20 20">
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     </svg>
@@ -302,34 +362,68 @@ function ShopPage() {
           {cart.length === 0 ? (
             <p className="mt-12 text-[15px] text-muted-foreground">
               Your cart is empty.{" "}
-              <Link to="/shop" className="underline-offset-4 hover:underline">Add a charm</Link>{" "}
+              <Link to="/shop" className="underline-offset-4 hover:underline">
+                Add a charm
+              </Link>{" "}
               to begin.
             </p>
           ) : (
             <ul className="mt-12 divide-y divide-border/60 border-y border-border/60">
               {cart.map((i) => (
                 <li key={i.product.id} className="flex items-center gap-4 py-6 md:gap-6">
-                  <img src={i.product.image} alt={i.product.name} width={88} height={88} className="h-20 w-16 object-cover md:h-22 md:w-20" />
+                  <img
+                    src={i.product.image}
+                    alt={i.product.name}
+                    width={88}
+                    height={88}
+                    className="h-20 w-16 object-cover md:h-22 md:w-20"
+                  />
                   <div className="flex-1 min-w-0">
                     <h3 className="font-serif text-lg truncate">{i.product.name}</h3>
-                    <p className="mt-1 text-sm tabular-nums text-muted-foreground">₹{i.product.price}</p>
+                    <p className="mt-1 text-sm tabular-nums text-muted-foreground">
+                      ₹{i.product.price}
+                    </p>
                   </div>
                   <div className="flex items-center gap-1 text-muted-foreground">
-                    <button onClick={() => setQty(i.product.id, i.qty - 1)} className="p-2 hover:text-foreground"><Minus className="h-3 w-3" /></button>
-                    <span className="w-6 text-center text-sm tabular-nums text-foreground">{i.qty}</span>
-                    <button onClick={() => setQty(i.product.id, i.qty + 1)} className="p-2 hover:text-foreground"><Plus className="h-3 w-3" /></button>
+                    <button
+                      onClick={() => setQty(i.product.id, i.qty - 1)}
+                      className="p-2 hover:text-foreground"
+                    >
+                      <Minus className="h-3 w-3" />
+                    </button>
+                    <span className="w-6 text-center text-sm tabular-nums text-foreground">
+                      {i.qty}
+                    </span>
+                    <button
+                      onClick={() => setQty(i.product.id, i.qty + 1)}
+                      className="p-2 hover:text-foreground"
+                    >
+                      <Plus className="h-3 w-3" />
+                    </button>
                   </div>
-                  <button onClick={() => setQty(i.product.id, 0)} className="p-2 text-muted-foreground hover:text-destructive"><Trash2 className="h-4 w-4" /></button>
+                  <button
+                    onClick={() => setQty(i.product.id, 0)}
+                    className="p-2 text-muted-foreground hover:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
                 </li>
               ))}
             </ul>
           )}
 
           <div className="mt-10 flex items-baseline justify-between">
-            <span className="text-[10px] uppercase tracking-[0.45em] text-muted-foreground">Total</span>
+            <span className="text-[10px] uppercase tracking-[0.45em] text-muted-foreground">
+              Total
+            </span>
             <span className="font-serif text-3xl tabular-nums">₹{total}</span>
           </div>
-          <Button onClick={() => setOrderOpen(true)} disabled={cart.length === 0} size="lg" className="mt-8 w-full rounded-none">
+          <Button
+            onClick={() => setOrderOpen(true)}
+            disabled={cart.length === 0}
+            size="lg"
+            className="mt-8 w-full rounded-none"
+          >
             Place order
           </Button>
           <p className="mt-4 text-center text-[10px] uppercase tracking-[0.35em] text-muted-foreground">
@@ -391,6 +485,15 @@ function ShopPage() {
 
       <SiteFooter />
       <OrderDialog open={orderOpen} onOpenChange={setOrderOpen} items={cart} />
+
+      <CustomisationDialog
+        open={customiseOpen}
+        onOpenChange={setCustomiseOpen}
+        product={customiseTarget}
+        onConfirm={(customisation) => {
+          if (customiseTarget) addToCart(customiseTarget, customisation);
+        }}
+      />
 
       {/* Floating WhatsApp / Chat button */}
       {/* <a

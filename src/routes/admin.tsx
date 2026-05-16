@@ -543,11 +543,7 @@ function InsightsTab() {
     setLoading(true);
     try {
       const { data } = await withTimeout(
-        supabase
-          .from("events")
-          .select("*")
-          .order("created_at", { ascending: false })
-          .limit(500),
+        supabase.from("events").select("*").order("created_at", { ascending: false }).limit(500),
       );
       if (data) setEvents(data as EventRow[]);
     } finally {
@@ -743,40 +739,30 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
 function AdminPage() {
   const [authed, setAuthed] = useState<boolean | null>(null);
 
+  useEffect(() => {
+    if (!supabaseEnabled) return;
+
+    withTimeout(supabase.auth.getSession(), 8000)
+      .then(({ data: { session } }) => setAuthed(!!session))
+      .catch(() => setAuthed(false));
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_e, session) => setAuthed(!!session));
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   if (!supabaseEnabled) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background px-4">
         <div className="max-w-md text-center">
           <Logo />
           <h2 className="mt-8 font-serif text-2xl">Admin not configured</h2>
-          <p className="mt-4 text-sm text-muted-foreground">
-            Supabase credentials are missing. Copy{" "}
-            <code className="rounded bg-muted px-1 py-0.5 text-xs">.env.example</code> to{" "}
-            <code className="rounded bg-muted px-1 py-0.5 text-xs">.env</code> and add your{" "}
-            <code className="rounded bg-muted px-1 py-0.5 text-xs">VITE_SUPABASE_URL</code> and{" "}
-            <code className="rounded bg-muted px-1 py-0.5 text-xs">VITE_SUPABASE_ANON_KEY</code>,
-            then restart.
-          </p>
-          <a
-            href="/"
-            className="mt-6 inline-block text-[11px] uppercase tracking-[0.3em] text-muted-foreground underline-offset-4 hover:underline"
-          >
-            ← Back to site
-          </a>
         </div>
       </div>
     );
   }
-
-  useEffect(() => {
-    withTimeout(supabase.auth.getSession(), 8000)
-      .then(({ data: { session } }) => setAuthed(!!session))
-      .catch(() => setAuthed(false));
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_e, session) => setAuthed(!!session));
-    return () => subscription.unsubscribe();
-  }, []);
 
   if (authed === null) {
     return (

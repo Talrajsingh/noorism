@@ -13,8 +13,9 @@ import { Button } from "@/components/ui/button";
 import { STORE, type Product } from "@/lib/store-config";
 import { trackEvent } from "@/lib/analytics";
 import { Mail } from "lucide-react";
+import { type Customisation } from "@/components/CustomisationDialog";
 
-type CartItem = { product: Product; qty: number; note?: string };
+type CartItem = { product: Product; qty: number; customisation?: Customisation; note?: string };
 
 export function OrderDialog({
   open,
@@ -29,7 +30,12 @@ export function OrderDialog({
   const [phone, setPhone] = useState("");
   const [notes, setNotes] = useState("");
 
-  const total = items.reduce((s, i) => s + i.product.price * i.qty, 0);
+  const SHIPPING_CHARGE = 99;
+  const FREE_SHIPPING_THRESHOLD = 999;
+
+  const subtotal = items.reduce((s, i) => s + i.product.price * i.qty, 0);
+  const shipping = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_CHARGE;
+  const total = subtotal + shipping;
 
   const buildMessage = () => {
     const lines = [
@@ -39,11 +45,25 @@ export function OrderDialog({
       `Phone: ${phone || "—"}`,
       ``,
       `Items:`,
-      ...items.map(
-        (i) =>
-          `• ${i.product.name} × ${i.qty} — ₹${i.product.price * i.qty}${i.note ? ` (${i.note})` : ""}`,
-      ),
+      ...items.map((i) => {
+        const c = i.customisation;
+        const customLines = c
+          ? [
+              c.charmName ? `   Name/Letters: ${c.charmName}` : null,
+              c.colour ? `   Colour: ${c.colour}` : null,
+              c.size ? `   Size: ${c.size}` : null,
+              c.extra ? `   Note: ${c.extra}` : null,
+            ]
+              .filter(Boolean)
+              .join("\n")
+          : null;
+        return [`• ${i.product.name} × ${i.qty} — ₹${i.product.price * i.qty}`, customLines]
+          .filter(Boolean)
+          .join("\n");
+      }),
       ``,
+      `Subtotal: ₹${subtotal}`,
+      `Shipping: ${shipping === 0 ? "Free" : `₹${shipping}`}`,
       `Total: ₹${total}`,
       notes ? `\nNotes: ${notes}` : "",
     ];
@@ -97,16 +117,53 @@ export function OrderDialog({
             ) : (
               <ul className="space-y-1">
                 {items.map((i) => (
-                  <li key={i.product.id} className="flex justify-between">
-                    <span>
-                      {i.product.name} × {i.qty}
-                    </span>
-                    <span>₹{i.product.price * i.qty}</span>
+                  <li key={i.product.id} className="flex flex-col gap-1">
+                    <div className="flex justify-between">
+                      <span>
+                        {i.product.name} × {i.qty}
+                      </span>
+                      <span>₹{i.product.price * i.qty} + shipping</span>
+                    </div>
+                    {i.customisation && (
+                      <ul className="ml-2 text-[11px] text-muted-foreground space-y-0.5">
+                        {i.customisation.charmName && (
+                          <li>
+                            ↳ Name: <strong>{i.customisation.charmName}</strong>
+                          </li>
+                        )}
+                        {i.customisation.colour && (
+                          <li>
+                            ↳ Colour: <strong>{i.customisation.colour}</strong>
+                          </li>
+                        )}
+                        {i.customisation.size && (
+                          <li>
+                            ↳ Size: <strong>{i.customisation.size}</strong>
+                          </li>
+                        )}
+                        {i.customisation.extra && <li>↳ Note: {i.customisation.extra}</li>}
+                      </ul>
+                    )}
                   </li>
                 ))}
+                <li className="mt-2 flex justify-between border-t pt-2 text-muted-foreground">
+                  <span>Subtotal</span>
+                  <span>₹{subtotal}</span>
+                </li>
+                <li className="flex justify-between text-muted-foreground">
+                  <span>Shipping</span>
+                  <span>
+                    {shipping === 0 ? <span className="text-green-700">Free</span> : `₹${shipping}`}
+                  </span>
+                </li>
+                {shipping > 0 && (
+                  <li className="text-[11px] text-muted-foreground">
+                    Free shipping on orders above ₹{FREE_SHIPPING_THRESHOLD}
+                  </li>
+                )}
                 <li className="mt-2 flex justify-between border-t pt-2 font-medium">
                   <span>Total</span>
-                  <span>₹{total} + Shipping</span>
+                  <span>₹{total}</span>
                 </li>
               </ul>
             )}
