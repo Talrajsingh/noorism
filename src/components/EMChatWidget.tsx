@@ -98,8 +98,14 @@ export default function EMChatWidget() {
   const [inputVal, setInputVal] = useState("");
   const [typing, setTyping] = useState(false);
   const [greeted, setGreeted] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(true);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowTooltip(false), 6000);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -460,47 +466,90 @@ export default function EMChatWidget() {
         </div>
       </div>
 
-      {/* FAB */}
-      <button
-        onClick={openChat}
-        aria-label="Chat with EM, Noorism support"
-        style={{
-          position: "fixed",
-          bottom: "24px",
-          right: "24px",
-          zIndex: 9999,
-          width: "52px",
-          height: "52px",
-          borderRadius: "50%",
-          background: "oklch(0.22 0.01 60)",
-          border: "none",
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          transform: open ? "scale(0.92)" : "scale(1)",
-          transition: "transform 0.2s ease",
-          fontFamily: "var(--font-serif, Cormorant Garamond, serif)",
-          fontSize: "17px",
-          fontStyle: "italic",
-          color: "oklch(0.972 0.006 80)",
-          letterSpacing: "0.03em",
-        }}
-        onMouseEnter={(e) => {
-          (e.currentTarget as HTMLButtonElement).style.transform = "scale(1.08)";
-        }}
-        onMouseLeave={(e) => {
-          (e.currentTarget as HTMLButtonElement).style.transform = open ? "scale(0.92)" : "scale(1)";
-        }}
-      >
-        {open ? "✕" : "EM"}
-      </button>
+      {/* FAB + Tooltip */}
+      <div style={{ position: "fixed", bottom: "24px", right: "24px", zIndex: 9999, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "10px" }}>
+
+        {/* Speech bubble tooltip */}
+        {showTooltip && !open && (
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            animation: "em-fadein 0.4s ease",
+          }}>
+            <div style={{
+              background: "oklch(0.985 0.005 80)",
+              border: "1px solid oklch(0.88 0.008 70)",
+              borderRadius: "20px 20px 4px 20px",
+              padding: "8px 14px",
+              fontSize: "12.5px",
+              color: "oklch(0.28 0.01 60)",
+              whiteSpace: "nowrap",
+              fontFamily: "var(--font-sans, Inter, sans-serif)",
+              lineHeight: 1.4,
+              boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
+            }}>
+              Hi! May I assist you? ✨
+            </div>
+            <button
+              onClick={() => setShowTooltip(false)}
+              aria-label="Dismiss"
+              style={{
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                fontSize: "11px",
+                color: "oklch(0.6 0.01 60)",
+                padding: "2px",
+                lineHeight: 1,
+              }}
+            >✕</button>
+          </div>
+        )}
+
+        {/* Circle FAB */}
+        <button
+          onClick={() => { openChat(); setShowTooltip(false); }}
+          aria-label="Chat with EM, Noorism support"
+          style={{
+            width: "52px",
+            height: "52px",
+            borderRadius: "50%",
+            background: "oklch(0.22 0.01 60)",
+            border: "none",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            transform: open ? "scale(0.92)" : "scale(1)",
+            transition: "transform 0.2s ease",
+            fontFamily: "var(--font-serif, Cormorant Garamond, serif)",
+            fontSize: "17px",
+            fontStyle: "italic",
+            color: "oklch(0.972 0.006 80)",
+            letterSpacing: "0.03em",
+            flexShrink: 0,
+          }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.transform = "scale(1.08)";
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.transform = open ? "scale(0.92)" : "scale(1)";
+          }}
+        >
+          {open ? "✕" : "EM"}
+        </button>
+      </div>
 
       {/* Keyframe animation injected once */}
       <style>{`
         @keyframes em-bounce {
           0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
           40% { opacity: 1; transform: scale(1); }
+        }
+        @keyframes em-fadein {
+          from { opacity: 0; transform: translateY(6px); }
+          to   { opacity: 1; transform: translateY(0); }
         }
       `}</style>
     </>
