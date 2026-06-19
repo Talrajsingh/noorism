@@ -240,9 +240,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  {
-    !location.pathname.startsWith("/admin") && <EMChatWidget />;
-  }
+  const location = useLocation();
 
   useEffect(() => {
     void import("@/lib/analytics").then((m) =>
@@ -253,7 +251,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <Outlet />
-      <EMChatWidget />
+      {!location.pathname.startsWith("/admin") && <EMChatWidget />}
     </QueryClientProvider>
   );
 }
