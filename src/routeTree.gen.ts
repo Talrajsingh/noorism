@@ -9,12 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ShopRouteImport } from './routes/shop'
 import { Route as AtelierRouteImport } from './routes/atelier'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShopProductIdRouteImport } from './routes/shop.$productId'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ShopRoute = ShopRouteImport.update({
   id: '/shop',
   path: '/shop',
@@ -46,6 +52,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/atelier': typeof AtelierRoute
   '/shop': typeof ShopRouteWithChildren
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/shop/$productId': typeof ShopProductIdRoute
 }
 export interface FileRoutesByTo {
@@ -53,6 +60,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/atelier': typeof AtelierRoute
   '/shop': typeof ShopRouteWithChildren
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/shop/$productId': typeof ShopProductIdRoute
 }
 export interface FileRoutesById {
@@ -61,14 +69,34 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/atelier': typeof AtelierRoute
   '/shop': typeof ShopRouteWithChildren
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/shop/$productId': typeof ShopProductIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/admin' | '/atelier' | '/shop' | '/shop/$productId'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/atelier'
+    | '/shop'
+    | '/sitemap.xml'
+    | '/shop/$productId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/atelier' | '/shop' | '/shop/$productId'
-  id: '__root__' | '/' | '/admin' | '/atelier' | '/shop' | '/shop/$productId'
+  to:
+    | '/'
+    | '/admin'
+    | '/atelier'
+    | '/shop'
+    | '/sitemap.xml'
+    | '/shop/$productId'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/atelier'
+    | '/shop'
+    | '/sitemap.xml'
+    | '/shop/$productId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -76,10 +104,18 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   AtelierRoute: typeof AtelierRoute
   ShopRoute: typeof ShopRouteWithChildren
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop': {
       id: '/shop'
       path: '/shop'
@@ -133,6 +169,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   AtelierRoute: AtelierRoute,
   ShopRoute: ShopRouteWithChildren,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
