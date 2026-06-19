@@ -12,11 +12,51 @@ import { trackEvent } from "@/lib/analytics";
 import { Star, Loader2, ArrowLeft, Check, MessageCircle } from "lucide-react";
 
 export const Route = createFileRoute("/shop/$productId")({
-  head: ({ params }) => ({
-    meta: [
-      { title: `${params.productId} — Noorism` },
-    ],
-  }),
+  head: ({ params }) => {
+    const product = PRODUCTS.find((p) => p.id === params.productId);
+    const baseUrl = "https://noorism.lovable.app";
+    const pageUrl = `${baseUrl}/shop/${params.productId}`;
+    const title = product ? `${product.name} — Noorism` : `${params.productId} — Noorism`;
+    const description = product?.description ?? "Handmade customisable wrist charm by Noorism.";
+    const imageUrl = product ? `${baseUrl}${product.image}` : `${baseUrl}/favicon.png`;
+
+    const productSchema = product
+      ? {
+          "@context": "https://schema.org",
+          "@type": "Product",
+          name: product.name,
+          image: [imageUrl],
+          description: product.description,
+          sku: product.id,
+          brand: { "@type": "Brand", name: "Noorism" },
+          offers: {
+            "@type": "Offer",
+            url: pageUrl,
+            price: product.price.toFixed(2),
+            priceCurrency: "USD",
+            availability: "https://schema.org/InStock",
+            itemCondition: "https://schema.org/NewCondition",
+            seller: { "@type": "Organization", name: "Noorism" },
+          },
+        }
+      : null;
+
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:type", content: "product" },
+        { property: "og:url", content: pageUrl },
+        { property: "og:image", content: imageUrl },
+      ],
+      links: [{ rel: "canonical", href: pageUrl }],
+      scripts: productSchema
+        ? [{ type: "application/ld+json", children: JSON.stringify(productSchema) }]
+        : [],
+    };
+  },
   component: ProductDetailPage,
   notFoundComponent: () => (
     <div className="min-h-screen bg-background text-foreground">
