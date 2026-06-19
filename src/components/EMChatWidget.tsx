@@ -9,60 +9,130 @@ interface Message {
 
 const QA: { keywords: string[]; answer: string }[] = [
   {
-    keywords: ["ship internationally", "international shipping", "ship worldwide", "worldwide shipping", "international"],
-    answer: "Yes! We ship worldwide 🌍 Delivery details and international rates are calculated at checkout.",
+    keywords: [
+      "ship internationally",
+      "international shipping",
+      "ship worldwide",
+      "worldwide shipping",
+      "international",
+    ],
+    answer:
+      "Yes! We ship worldwide 🌍 Delivery details and international rates are calculated at checkout.",
   },
   {
-    keywords: ["how long does shipping", "shipping take", "when will it arrive", "delivery time", "how long does it take to ship"],
-    answer: "Since each piece is hand-strung in small batches, please allow 3–5 business days for us to make your charm before it ships.",
+    keywords: [
+      "how long does shipping",
+      "shipping take",
+      "when will it arrive",
+      "delivery time",
+      "how long does it take to ship",
+    ],
+    answer:
+      "Since each piece is hand-strung in small batches, please allow 3–5 business days for us to make your charm before it ships.",
   },
   {
-    keywords: ["how long does a custom", "custom order take", "how long to make", "processing time"],
-    answer: "Each piece is lovingly hand-strung to order. Please allow 3–5 business days for production before your order ships.",
+    keywords: [
+      "how long does a custom",
+      "custom order take",
+      "how long to make",
+      "processing time",
+    ],
+    answer:
+      "Each piece is lovingly hand-strung to order. Please allow 3–5 business days for production before your order ships.",
   },
   {
-    keywords: ["custom name", "add my name", "signature", "custom text", "personalize", "personalise", "my name"],
-    answer: "You can type your desired name or text right in the checkout notes, or use our interactive builder on the homepage!",
+    keywords: [
+      "custom name",
+      "add my name",
+      "signature",
+      "custom text",
+      "personalize",
+      "personalise",
+      "my name",
+    ],
+    answer:
+      "You can type your desired name or text right in the checkout notes, or use our interactive builder on the homepage!",
   },
   {
-    keywords: ["length", "how long", "wrist size", "size of charm", "wrist charm size", "6 inch", "7 inch"],
-    answer: "Our standard wrist charms are about 6–7 inches, made with a slight stretch to fit comfortably on most wrists.",
+    keywords: [
+      "length",
+      "how long",
+      "wrist size",
+      "size of charm",
+      "wrist charm size",
+      "6 inch",
+      "7 inch",
+    ],
+    answer:
+      "Our standard wrist charms are about 6–7 inches, made with a slight stretch to fit comfortably on most wrists.",
   },
   {
-    keywords: ["color palette", "specific color", "color mix", "custom colors", "pastel", "pearl color", "colours"],
-    answer: "Absolutely! If you want a specific mix of pearls or pastels, just leave a note for us at checkout. We love making it personal ✨",
+    keywords: [
+      "color palette",
+      "specific color",
+      "color mix",
+      "custom colors",
+      "pastel",
+      "pearl color",
+      "colours",
+    ],
+    answer:
+      "Absolutely! If you want a specific mix of pearls or pastels, just leave a note for us at checkout. We love making it personal ✨",
   },
   {
-    keywords: ["materials", "what are they made", "what do you use", "faux pearl", "acrylic", "beads", "cord"],
-    answer: "We use high-quality faux pearls, pastel acrylic beads, durable nylon cords, and metallic letter beads.",
+    keywords: [
+      "materials",
+      "what are they made",
+      "what do you use",
+      "faux pearl",
+      "acrylic",
+      "beads",
+      "cord",
+    ],
+    answer:
+      "We use high-quality faux pearls, pastel acrylic beads, durable nylon cords, and metallic letter beads.",
   },
   {
     keywords: ["waterproof", "water resistant", "swimming", "shower", "wet", "water"],
-    answer: "To keep your charms looking pristine and prevent metallic letters from fading, we recommend removing them before swimming or showering.",
+    answer:
+      "To keep your charms looking pristine and prevent metallic letters from fading, we recommend removing them before swimming or showering.",
   },
   {
-    keywords: ["change my order", "fix a typo", "modify order", "change custom text", "after ordering", "wrong name"],
-    answer: "Please email us at shopnoorism@gmail.com within 2 hours of ordering if you need to fix a typo — we'll sort it right away!",
+    keywords: [
+      "change my order",
+      "fix a typo",
+      "modify order",
+      "change custom text",
+      "after ordering",
+      "wrong name",
+    ],
+    answer:
+      "Please email us at shopnoorism@gmail.com within 2 hours of ordering if you need to fix a typo — we'll sort it right away!",
   },
   {
     keywords: ["returns", "return policy", "refund", "exchange", "return"],
-    answer: "Because every item is made-to-order and personalised just for you, we cannot accept returns unless the item arrives damaged.",
+    answer:
+      "Because every item is made-to-order and personalised just for you, we cannot accept returns unless the item arrives damaged.",
   },
   {
     keywords: ["charm breaks", "cord breaks", "broken charm", "warranty", "replace", "damaged"],
-    answer: "We want you to love your signature piece! If your cord breaks within 14 days of delivery, contact us and we'll replace it 🤍",
+    answer:
+      "We want you to love your signature piece! If your cord breaks within 14 days of delivery, contact us and we'll replace it 🤍",
   },
   {
     keywords: ["contact", "email", "reach you", "get in touch", "customer service"],
-    answer: "You can reach us at shopnoorism@gmail.com — we'll get back to you as soon as possible!",
+    answer:
+      "You can reach us at shopnoorism@gmail.com — we'll get back to you as soon as possible!",
   },
   {
     keywords: ["price", "cost", "how much", "pricing", "rate"],
-    answer: "Prices vary by style and customisation. Check our shop page for the latest listings and bundle deals!",
+    answer:
+      "Prices vary by style and customisation. Check our shop page for the latest listings and bundle deals!",
   },
   {
     keywords: ["hi", "hello", "hey", "hiya", "howdy", "helo"],
-    answer: "Hi there! Welcome to Noorism. I can help you with sizing, custom orders, or shipping info. What's on your mind? 🌸",
+    answer:
+      "Hi there! Welcome to Noorism. I can help you with sizing, custom orders, or shipping info. What's on your mind? 🌸",
   },
   {
     keywords: ["thank you", "thanks", "thank u", "thx", "ty", "tysm"],
@@ -295,18 +365,9 @@ export default function EMChatWidget() {
                   borderRadius: msg.role === "user" ? "14px 14px 3px 14px" : "14px 14px 14px 3px",
                   fontSize: "13.5px",
                   lineHeight: 1.55,
-                  background:
-                    msg.role === "user"
-                      ? "oklch(0.22 0.01 60)"
-                      : "oklch(0.972 0.006 80)",
-                  color:
-                    msg.role === "user"
-                      ? "oklch(0.972 0.006 80)"
-                      : "oklch(0.22 0.01 60)",
-                  border:
-                    msg.role === "user"
-                      ? "none"
-                      : "1px solid oklch(0.88 0.008 70)",
+                  background: msg.role === "user" ? "oklch(0.22 0.01 60)" : "oklch(0.972 0.006 80)",
+                  color: msg.role === "user" ? "oklch(0.972 0.006 80)" : "oklch(0.22 0.01 60)",
+                  border: msg.role === "user" ? "none" : "1px solid oklch(0.88 0.008 70)",
                 }}
               >
                 {msg.text}
@@ -458,7 +519,16 @@ export default function EMChatWidget() {
               fontSize: "15px",
             }}
           >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="oklch(0.972 0.006 80)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="oklch(0.972 0.006 80)"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <line x1="22" y1="2" x2="11" y2="13"></line>
               <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
             </svg>
@@ -467,28 +537,42 @@ export default function EMChatWidget() {
       </div>
 
       {/* FAB + Tooltip */}
-      <div style={{ position: "fixed", bottom: "24px", right: "24px", zIndex: 9999, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "10px" }}>
-
+      <div
+        style={{
+          position: "fixed",
+          bottom: "24px",
+          right: "24px",
+          zIndex: 9999,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-end",
+          gap: "10px",
+        }}
+      >
         {/* Speech bubble tooltip */}
         {showTooltip && !open && (
-          <div style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-            animation: "em-fadein 0.4s ease",
-          }}>
-            <div style={{
-              background: "oklch(0.985 0.005 80)",
-              border: "1px solid oklch(0.88 0.008 70)",
-              borderRadius: "20px 20px 4px 20px",
-              padding: "8px 14px",
-              fontSize: "12.5px",
-              color: "oklch(0.28 0.01 60)",
-              whiteSpace: "nowrap",
-              fontFamily: "var(--font-sans, Inter, sans-serif)",
-              lineHeight: 1.4,
-              boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
-            }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              animation: "em-fadein 0.4s ease",
+            }}
+          >
+            <div
+              style={{
+                background: "oklch(0.985 0.005 80)",
+                border: "1px solid oklch(0.88 0.008 70)",
+                borderRadius: "20px 20px 4px 20px",
+                padding: "8px 14px",
+                fontSize: "12.5px",
+                color: "oklch(0.28 0.01 60)",
+                whiteSpace: "nowrap",
+                fontFamily: "var(--font-sans, Inter, sans-serif)",
+                lineHeight: 1.4,
+                boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
+              }}
+            >
               Hi! May I assist you? ✨
             </div>
             <button
@@ -503,13 +587,18 @@ export default function EMChatWidget() {
                 padding: "2px",
                 lineHeight: 1,
               }}
-            >✕</button>
+            >
+              ✕
+            </button>
           </div>
         )}
 
         {/* Circle FAB */}
         <button
-          onClick={() => { openChat(); setShowTooltip(false); }}
+          onClick={() => {
+            openChat();
+            setShowTooltip(false);
+          }}
           aria-label="Chat with EM, Noorism support"
           style={{
             width: "52px",
@@ -534,7 +623,9 @@ export default function EMChatWidget() {
             (e.currentTarget as HTMLButtonElement).style.transform = "scale(1.08)";
           }}
           onMouseLeave={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.transform = open ? "scale(0.92)" : "scale(1)";
+            (e.currentTarget as HTMLButtonElement).style.transform = open
+              ? "scale(0.92)"
+              : "scale(1)";
           }}
         >
           {open ? "✕" : "EM"}

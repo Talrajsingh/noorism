@@ -76,13 +76,24 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Noorism — Handmade Customisable Wrist Charms" },
-      { name: "description", content: "Noorism — handmade, customisable wrist charms hand-strung in small batches. Personalised name charms, pearl stacks and signature pieces." },
+      {
+        name: "description",
+        content:
+          "Noorism — handmade, customisable wrist charms hand-strung in small batches. Personalised name charms, pearl stacks and signature pieces.",
+      },
       { name: "google-site-verification", content: "fuiWVyT-XRrw7ahEM9wZT7lhN3gbwAnqmdHYYW6_P9k" },
       { name: "author", content: "Noorism" },
       { name: "publisher", content: "Noorism" },
       { name: "copyright", content: "Noorism" },
-      { name: "keywords", content: "Noorism, noorism, noorism bracelets, noorism wrist charms, wrist charms, handmade bracelets, personalised charms, custom name bracelet, pearl bracelet India, handmade jewellery India, charm bracelet, friendship bracelet, customisable bracelet, made to order jewellery, small batch jewellery, shopnoorism" },
-      { name: "robots", content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" },
+      {
+        name: "keywords",
+        content:
+          "Noorism, noorism, noorism bracelets, noorism wrist charms, wrist charms, handmade bracelets, personalised charms, custom name bracelet, pearl bracelet India, handmade jewellery India, charm bracelet, friendship bracelet, customisable bracelet, made to order jewellery, small batch jewellery, shopnoorism",
+      },
+      {
+        name: "robots",
+        content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+      },
       { name: "googlebot", content: "index, follow, max-image-preview:large, max-snippet:-1" },
       { name: "bingbot", content: "index, follow" },
       { name: "rating", content: "general" },
@@ -101,7 +112,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "geo.placename", content: "India" },
       { property: "og:site_name", content: "Noorism" },
       { property: "og:title", content: "Noorism — Handmade Customisable Wrist Charms" },
-      { property: "og:description", content: "Handmade, customisable wrist charms hand-strung in small batches." },
+      {
+        property: "og:description",
+        content: "Handmade, customisable wrist charms hand-strung in small batches.",
+      },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://noorism.lovable.app" },
       { property: "og:locale", content: "en_IN" },
@@ -109,7 +123,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:site", content: "@noorism" },
       { name: "twitter:creator", content: "@noorism" },
       { name: "twitter:title", content: "Noorism — Handmade Customisable Wrist Charms" },
-      { name: "twitter:description", content: "Handmade, customisable wrist charms hand-strung in small batches." },
+      {
+        name: "twitter:description",
+        content: "Handmade, customisable wrist charms hand-strung in small batches.",
+      },
       {
         property: "og:image",
         content:
@@ -157,14 +174,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
                 "@type": "ImageObject",
                 url: "https://noorism.lovable.app/favicon.ico",
               },
-              foundingLocation: { "@type": "Place", address: { "@type": "PostalAddress", addressCountry: "IN" } },
-              contactPoint: [{
-                "@type": "ContactPoint",
-                email: "shopnoorism@gmail.com",
-                contactType: "customer support",
-                areaServed: "IN",
-                availableLanguage: ["English", "Hindi"],
-              }],
+              foundingLocation: {
+                "@type": "Place",
+                address: { "@type": "PostalAddress", addressCountry: "IN" },
+              },
+              contactPoint: [
+                {
+                  "@type": "ContactPoint",
+                  email: "shopnoorism@gmail.com",
+                  contactType: "customer support",
+                  areaServed: "IN",
+                  availableLanguage: ["English", "Hindi"],
+                },
+              ],
               sameAs: [],
             },
             {
@@ -218,7 +240,9 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const location = useLocation();
+  {
+    !location.pathname.startsWith("/admin") && <EMChatWidget />;
+  }
 
   useEffect(() => {
     void import("@/lib/analytics").then((m) =>
